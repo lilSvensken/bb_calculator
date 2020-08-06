@@ -1,0 +1,122 @@
+body * {
+    font-size: 32px;
+    font-family: cursive;
+    box-sizing: border-box;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.calculator-wrapper {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    grid-gap: 20px;
+    padding: 20px;
+    background-color: #cafff8;
+    border: 1px solid #828282;
+    border-radius: 8px;
+    box-shadow: 2px 2px 12px #acacac;
+    position: relative;
+    width: 590px;
+}
+
+.result-wrapper {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.result-wrapper, .history-wrapper {
+    background-color: #efefef;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #666666;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 12px;
+}
+
+.btn {
+    padding: 18px 0;
+    box-shadow: 2px 3px 2px #acacac;
+    outline: none;
+    background-color: #efefef;
+    border: 1px solid #0000009c;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.btn.mod-active {
+    pointer-events: auto;
+}
+
+.btn:hover {
+    background-color: #dedede;
+}
+
+.btn-on-off, .btn-c {
+    padding: 12px 0;
+    font-size: 22px;
+}
+
+.btn-on-off {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    pointer-events: auto;
+}
+
+.btn-c {
+    grid-column-start: 3;
+    grid-column-end: 5;
+    background-color: #ff9492;
+}
+
+.btn-c:hover {
+    background-color: #ff7372;
+}
+
+.history-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.caption {
+    margin-bottom: 6px;
+    font-size: 18px;
+}
+
+.value-wrapper {
+    width: 100%;
+    pointer-events: none;
+    word-break: break-all;
+}
+
+.value {
+    flex: 1 1 100%;
+    background-color: #bbbbbb;
+    border: 1px solid #666666;
+    border-radius: 4px;
+    padding: 4px 18px;
+    text-align: end;
+    font-size: 16px;
+    height: 34px;
+    width: 100%;
+    word-break: break-all;
+}
+
+.value.mod-active {
+    background-color: #ffffff;
+}
+
+.calc-name {
+    font-size: 16px;
+    font-family: monospace;
+    right: 40px;
+    position: absolute;
+    bottom: 1px;
+}
