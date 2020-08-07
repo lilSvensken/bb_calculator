@@ -47,8 +47,8 @@ body * {
 }
 
 .btn {
-    padding: 18px 0;
     min-width: 50px;
+    height: 68px;
     box-shadow: 2px 3px 2px #acacac;
     outline: none;
     background-color: #efefef;
@@ -67,7 +67,7 @@ body * {
 }
 
 .btn-on-off, .btn-c {
-    padding: 12px 0;
+    /*padding: 12px 0;*/
     font-size: 22px;
 }
 
@@ -141,15 +141,15 @@ body * {
     align-items: center;
 }
 
-.btn-add-keypad {
-    padding: 2px 10px;
+.btn-add-keypad {]
     width: 30px;
     min-width: auto;
+    height: 90px;
 }
 
 .additional-keypad {
     display: grid;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
     grid-gap: 12px;
     margin-left: 10px;
 }
