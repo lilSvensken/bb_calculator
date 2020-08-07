@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Calculator</title>
+  <title>Lizocalc-2020-dk</title>
   <link rel="stylesheet" type="text/css" href="page.css">
   <script type="text/javascript" src="page.js"></script>
 </head>
@@ -16,18 +16,23 @@
       <div class="value" id="result"></div>
     </div>
 
+    <div class="history-wrapper">
+      <div class="caption">История:</div>
+      <div class="value" id="history-operation"></div>
+    </div>
+
     <div class="keypad-wrapper">
       <div class="keypad">
-        <button class="btn btn-on-off" data-val="(выход)" id="toggle-on-off">on/off</button>
-        <button class="btn btn-c" data-val="(стереть)" id="clear">C</button>
+        <button class="btn long-btn btn-on-off" data-val="(выход)" id="toggle-on-off">on/off</button>
+        <button class="btn long-btn btn-c" data-val="(стереть)" id="clear">C</button>
         <button class="btn" data-val="7">7</button>
         <button class="btn" data-val="8">8</button>
         <button class="btn" data-val="9">9</button>
-        <button class="btn" data-val="/">/</button>
+        <button class="btn" data-val="/">÷</button>
         <button class="btn" data-val="4">4</button>
         <button class="btn" data-val="5">5</button>
         <button class="btn" data-val="6">6</button>
-        <button class="btn" data-val="*">*</button>
+        <button class="btn" data-val="*">×</button>
         <button class="btn" data-val="1">1</button>
         <button class="btn" data-val="2">2</button>
         <button class="btn" data-val="3">3</button>
@@ -39,11 +44,19 @@
       </div>
     </div>
 
-    <div class="history-wrapper">
-      <div class="caption">История:</div>
-      <div class="value" id="history-operation"></div>
+    <div class="additional-keypad-wrapper">
+      <div class="btn-add-keypad-wrapper">
+        <button class="btn btn-add-keypad" id="btn-add-keypad">></button>
+      </div>
+      <div class="additional-keypad">
+        <button class="btn" data-val="7">7</button>
+        <button class="btn" data-val="8">8</button>
+        <button class="btn" data-val="9">9</button>
+        <button class="btn" data-val="/">÷</button>
+      </div>
     </div>
-    <div class="calc-name" id="test">"Lizocalc-2020-dk"</div>
+
+    <div class="calc-name">"Lizocalc-2020-dk"</div>
   </div>
 </div>
 

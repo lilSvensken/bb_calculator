@@ -14,6 +14,9 @@ class ShowHistory {
   btnClear;
   toggleOnOff;
   includedCalc = false;
+  symbols = ['+', '-', '*', '/', '.'];
+  enterNumberKey = false;
+
 
   constructor() {
     this.btnsKeyboard = document.querySelectorAll('.btn');
@@ -39,7 +42,7 @@ class ShowHistory {
     }
 
     this.btnClear.ondblclick = () => {
-      this.historyClearAll();
+      this.clearAllCalculations();
     }
 
     this.toggleOnOff.onclick = () => {
@@ -57,32 +60,37 @@ class ShowHistory {
           this.historyClearLastSymbol();
           break;
         case 'Delete':
-          this.historyClearAll();
+          if (this.includedCalc) {
+            this.clearAllCalculations();
+          }
           break;
         case 'Escape':
           this.toggleCalc();
           break;
         default:
-          if (Number(nameKey) ||
-            nameKey === '+' ||
-            nameKey === '-'||
-            nameKey === '*' ||
-            nameKey === '/'||
-            nameKey === '='||
-            nameKey === '.') {
-            this.showHistory(nameKey);
+          if (this.includedCalc) {
+            if (Number(nameKey) || this.symbols.some((symbol) => nameKey === symbol)) {
+              this.showHistory(nameKey);
+            }
           }
       }
     }
   }
 
   showHistory(nameKey) {
-    this.historyElem.innerHTML += nameKey;
+    if (this.enterNumberKey && this.symbols.some((symbol) => nameKey === symbol)) {
+      this.historyElem.innerHTML += nameKey;
+      this.enterNumberKey = false;
+    } else if (Number(nameKey) || nameKey === '-') {
+      this.historyElem.innerHTML += nameKey;
+      this.enterNumberKey = true;
+    }
   }
 
   showResult() {
     if (this.historyElem.innerHTML) {
       this.resultElem.innerHTML = window.eval(this.historyElem.innerHTML);
+      this.enterNumberKey = false
     }
   }
 
@@ -91,7 +99,7 @@ class ShowHistory {
     this.historyElem.innerHTML = historyStr.substr(0, historyStr.length - 1);
   }
 
-  historyClearAll() {
+  clearAllCalculations() {
     this.historyElem.innerHTML = '';
     this.resultElem.innerHTML = '0';
   }
