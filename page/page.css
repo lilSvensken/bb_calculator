@@ -130,7 +130,7 @@ body * {
     bottom: 1px;
 }
 
-.additional-keypad-wrapper {
+.add-keypad-wrapper {
     display: flex;
     grid-column-start: 3;
     grid-column-end: 3;
@@ -145,6 +145,14 @@ body * {
     width: 30px;
     min-width: auto;
     height: 90px;
+}
+
+.additional-keypad-wrapper {
+    display: none;
+}
+
+.additional-keypad-wrapper.mod-show {
+    display: block;
 }
 
 .additional-keypad {

@@ -1,12 +1,12 @@
 class Page {
-  showHistory = new ShowHistory();
+  operations = new Operations();
 
   constructor() {
 
   }
 }
 
-class ShowHistory {
+class Operations {
   btnsKeyboard;
   historyElem;
   btnResult;
@@ -14,9 +14,11 @@ class ShowHistory {
   btnClear;
   toggleOnOff;
   includedCalc = false;
-  symbols = ['+', '-', '*', '/', '.'];
+  arithmeticSign = ['+', '-', '*', '/', '.', '(', ')', '0', '√', '²'];
   enterNumberKey = false;
-
+  btnAddKeypad;
+  additionalKeypadElem;
+  showAdditionalKeypad = false;
 
   constructor() {
     this.btnsKeyboard = document.querySelectorAll('.btn');
@@ -25,10 +27,12 @@ class ShowHistory {
     this.resultElem = document.querySelector('#result');
     this.btnClear = document.querySelector('#clear');
     this.toggleOnOff = document.querySelector('#toggle-on-off');
+    this.btnAddKeypad = document.querySelector('#btn-add-keypad');
+    this.additionalKeypadElem = document.querySelector('#additional-keypad-wrapper');
 
     this.btnsKeyboard.forEach(elem => {
       elem.onclick = () => {
-        const nameKey = elem.getAttribute('data-val')
+        const nameKey = elem.getAttribute('data-val');
         this.showHistory(nameKey);
       }
     })
@@ -38,7 +42,7 @@ class ShowHistory {
     }
 
     this.btnClear.onclick = () => {
-      this.historyClearLastSymbol();
+      this.clearLastSymbolHistory();
     }
 
     this.btnClear.ondblclick = () => {
@@ -49,6 +53,10 @@ class ShowHistory {
       this.toggleCalc();
     }
 
+    this.btnAddKeypad.onclick = () => {
+      this.toggleAdditionalKeypad();
+    }
+
     window.onkeydown = (e) => {
       let nameKey = e.key
       switch (nameKey) {
@@ -57,7 +65,7 @@ class ShowHistory {
           this.showResult();
           break;
         case 'Backspace':
-          this.historyClearLastSymbol();
+          this.clearLastSymbolHistory();
           break;
         case 'Delete':
           if (this.includedCalc) {
@@ -69,7 +77,7 @@ class ShowHistory {
           break;
         default:
           if (this.includedCalc) {
-            if (Number(nameKey) || this.symbols.some((symbol) => nameKey === symbol)) {
+            if (Number(nameKey) || this.checkForArithmeticSign(nameKey)) {
               this.showHistory(nameKey);
             }
           }
@@ -78,23 +86,31 @@ class ShowHistory {
   }
 
   showHistory(nameKey) {
-    if (this.enterNumberKey && this.symbols.some((symbol) => nameKey === symbol)) {
+    // console.log(nameKey)
+    if (this.enterNumberKey && this.checkForArithmeticSign(nameKey)) {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = false;
-    } else if (Number(nameKey) || nameKey === '-') {
+    } else if (Number(nameKey) || nameKey === '-' || nameKey === '(' || nameKey === '√') {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = true;
     }
   }
 
   showResult() {
-    if (this.historyElem.innerHTML) {
-      this.resultElem.innerHTML = window.eval(this.historyElem.innerHTML);
+    // const historyStr = this.historyElem.innerHTML
+    const historyStr = '3+5-√9+1*9'
+    if (historyStr) {
+      if (historyStr.match(/[√]/g)) {    // todo "(/[√]+/g)"
+        const radicand = this.getRadicand(historyStr)
+        this.resultElem.innerHTML = Math.sqrt(radicand);
+      } else {
+        this.resultElem.innerHTML = window.eval(this.historyElem.innerHTML);
+      }
       this.enterNumberKey = false
     }
   }
 
-  historyClearLastSymbol() {
+  clearLastSymbolHistory() {
     let historyStr = this.historyElem.innerHTML;
     this.historyElem.innerHTML = historyStr.substr(0, historyStr.length - 1);
   }
@@ -123,6 +139,50 @@ class ShowHistory {
       })
       this.includedCalc = true;
     }
+  }
+
+  toggleAdditionalKeypad() {
+    if (this.showAdditionalKeypad) {
+      this.additionalKeypadElem.classList.remove('mod-show')
+      this.btnAddKeypad.innerText = '>';
+      this.showAdditionalKeypad = false;
+    } else {
+      this.additionalKeypadElem.classList.add('mod-show')
+      this.btnAddKeypad.innerText = '<';
+      this.showAdditionalKeypad = true;
+    }
+  }
+
+  checkForArithmeticSign(nameKey) {
+    let enterArithmeticSign = false;
+    if (this.arithmeticSign.some((sign) => nameKey === sign)) {
+      enterArithmeticSign = true;
+    }
+    return enterArithmeticSign;
+  }
+
+  getRadicand(historyStr) {
+    console.log(historyStr);
+    const indexRoot = historyStr.indexOf('√');
+    let indexLastSignsArr = [];
+    this.arithmeticSign.forEach(sign => {
+      let qwe = '9'
+      // const regexp = new RegExp(`${ qwe }`, 'g');
+      console.log(historyStr.search(/[+]?/g));
+      if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
+        indexLastSignsArr.push(historyStr.indexOf(sign));
+      }
+    })
+    let lastSign = indexLastSignsArr[0];
+    indexLastSignsArr.forEach(elem => {
+      if (lastSign > elem) {
+        lastSign = elem;
+      }
+    })
+    const radicand = historyStr.substring(indexRoot + 1, lastSign)
+    console.log('radicand', radicand)
+
+    return radicand
   }
 }
 
