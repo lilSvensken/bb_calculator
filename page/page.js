@@ -166,7 +166,6 @@ class Operations {
     const indexRoot = historyStr.indexOf('√');
     let indexLastSignsArr = [];
     this.arithmeticSign.forEach(sign => {
-      let qwe = '9'
       // const regexp = new RegExp(`${ qwe }`, 'g');
       console.log(historyStr.search(/[+]?/g));
       if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
