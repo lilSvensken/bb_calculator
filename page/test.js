@@ -23,6 +23,12 @@ function getRadicand(historyStr) {
   return radicand
 }
 
+// this.arithmeticSign.forEach(sign => {
+//   if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
+//     indexLastSignsArr.push(historyStr.indexOf(sign));
+//   }
+// })
+
 
 const arithmeticSign = ['+', '-', '*', '/', '.', '(', ')', '0', '√', '²'];
 const str = '3+5-√9+1*9'

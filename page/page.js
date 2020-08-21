@@ -99,16 +99,28 @@ class Operations {
   }
 
   showResult() {
-    // const historyStr = this.historyElem.innerHTML
-    const historyStr = '3+5-√9+1*9'
-    if (historyStr) {
-      if (historyStr.match(/[√]/g)) {    // todo "(/[√]+/g)"
-        const radicand = this.getRadicand(historyStr)
-        this.resultElem.innerHTML = Math.sqrt(radicand);
-      } else {
-        this.resultElem.innerHTML = window.eval(this.historyElem.innerHTML);
+    let arithmeticStr = this.historyElem.innerHTML;
+    if (arithmeticStr) {
+      for (let i = 0; i < arithmeticStr.length; i++) {
+        let calculatedNum;
+        let resultCalculatedNum;
+        let substr;
+        if (arithmeticStr[i] === '√') {
+          calculatedNum = this.getRadicand(arithmeticStr)
+          resultCalculatedNum = Math.sqrt(calculatedNum);
+          substr = arithmeticStr.substr(i, calculatedNum.length + 1)
+        }
+        if (arithmeticStr[i] === '²') {
+          calculatedNum = this.getSquareNum(arithmeticStr)
+          console.log(123)
+          resultCalculatedNum = Math.pow(calculatedNum, 2);
+          substr = arithmeticStr.substring(calculatedNum.length + 1, i + 1)
+        }
+        arithmeticStr = arithmeticStr.replace(substr, String(resultCalculatedNum))
       }
     }
+    console.log(arithmeticStr)
+    this.resultElem.innerHTML = window.eval(arithmeticStr);
   }
 
   clearLastSymbolHistory() {
@@ -162,36 +174,48 @@ class Operations {
     return enterArithmeticSign;
   }
 
-  getRadicand(historyStr) {
-    console.log(123);
-    const indexRoot = historyStr.indexOf('√');
-    let indexLastSignsArr = [];
+  getRadicand(arithmeticStr) {
+    const indexRoot = arithmeticStr.indexOf('√');
+    let indexNextSignsArr = [];
 
-    for (let i = 0; historyStr.length; i++) {
+    for (let i = 0; i < arithmeticStr.length; i++) {
       this.arithmeticSign.forEach(sign => {
-        if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
-          indexLastSignsArr.push(historyStr.indexOf(sign));
+        if (arithmeticStr[i] === sign && i > indexRoot) {
+          indexNextSignsArr.push(i)
         }
       })
     }
 
-    console.log(indexLastSignsArr)
-    // this.arithmeticSign.forEach(sign => {
-    //   if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
-    //     indexLastSignsArr.push(historyStr.indexOf(sign));
-    //   }
-    // })
-
-    let lastSign = indexLastSignsArr[0];
-    indexLastSignsArr.forEach(elem => {
-      if (lastSign > elem) {
-        lastSign = elem;
+    let indexNextSign = indexNextSignsArr[0];
+    indexNextSignsArr.forEach(elem => {
+      if (indexNextSign > elem) {
+        indexNextSign = elem;
       }
     })
-    const radicand = historyStr.substring(indexRoot + 1, lastSign)
-    // console.log('radicand', radicand)
 
-    return radicand
+    return arithmeticStr.substring(indexRoot + 1, indexNextSign)
+  }
+
+  getSquareNum(arithmeticStr) {
+    const indexSquareNum = arithmeticStr.indexOf('²');
+    let indexPrevSignsArr = [];
+
+    for (let i = 0; i < arithmeticStr.length; i++) {
+      this.arithmeticSign.forEach(sign => {
+        if (arithmeticStr[i] === sign && i < indexSquareNum) {
+          indexPrevSignsArr.push(i)
+          console.log(111) // todo 6^2 проходит по несколько раз
+        }
+      })
+    }
+    let indexNextSign = indexPrevSignsArr[indexPrevSignsArr.length - 1];
+    indexPrevSignsArr.forEach(elem => {
+      if (indexNextSign < elem) {
+        indexNextSign = elem;
+      }
+    })
+
+    return arithmeticStr.substring(indexNextSign + 1, indexSquareNum)
   }
 }
 
