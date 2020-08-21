@@ -86,13 +86,15 @@ class Operations {
   }
 
   showHistory(nameKey) {
-    // console.log(nameKey)
     if (this.enterNumberKey && this.checkForArithmeticSign(nameKey)) {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = false;
-    } else if (Number(nameKey) || nameKey === '-' || nameKey === '(' || nameKey === '√') {
+    } else if (Number(nameKey) || nameKey === '(' || nameKey === '√') {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = true;
+    }
+    if (!this.historyElem.innerHTML) {
+      this.enterNumberKey = false;
     }
   }
 
@@ -106,7 +108,6 @@ class Operations {
       } else {
         this.resultElem.innerHTML = window.eval(this.historyElem.innerHTML);
       }
-      this.enterNumberKey = false
     }
   }
 
@@ -162,16 +163,25 @@ class Operations {
   }
 
   getRadicand(historyStr) {
-    console.log(historyStr);
+    console.log(123);
     const indexRoot = historyStr.indexOf('√');
     let indexLastSignsArr = [];
-    this.arithmeticSign.forEach(sign => {
-      // const regexp = new RegExp(`${ qwe }`, 'g');
-      console.log(historyStr.search(/[+]?/g));
-      if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
-        indexLastSignsArr.push(historyStr.indexOf(sign));
-      }
-    })
+
+    for (let i = 0; historyStr.length; i++) {
+      this.arithmeticSign.forEach(sign => {
+        if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
+          indexLastSignsArr.push(historyStr.indexOf(sign));
+        }
+      })
+    }
+
+    console.log(indexLastSignsArr)
+    // this.arithmeticSign.forEach(sign => {
+    //   if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
+    //     indexLastSignsArr.push(historyStr.indexOf(sign));
+    //   }
+    // })
+
     let lastSign = indexLastSignsArr[0];
     indexLastSignsArr.forEach(elem => {
       if (lastSign > elem) {
@@ -179,7 +189,7 @@ class Operations {
       }
     })
     const radicand = historyStr.substring(indexRoot + 1, lastSign)
-    console.log('radicand', radicand)
+    // console.log('radicand', radicand)
 
     return radicand
   }

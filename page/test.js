@@ -1,22 +1,40 @@
-window.onload = () => {
-  const btn = document.querySelectorAll('.btn')
-  const historyOperationElem = document.querySelector('#history-operation')
-  const btnResult = document.querySelector('#btn-result')
-  const resultElem = document.querySelector('#result')
+function getRadicand(historyStr) {
+  console.log(historyStr);
+  const indexRoot = historyStr.indexOf('√');
+  let indexLastSignsArr = [];
+  this.arithmeticSign.forEach(sign => {
+    // const regexp = new RegExp(`${ sign }`, 'g'); // ??????
+    console.log(/\+{1,4}/g.exec('3+5-√9+1*9'));
+    if (historyStr.indexOf(sign) > indexRoot && historyStr.indexOf(sign) !== -1) {
+      indexLastSignsArr.push(historyStr.indexOf(sign));
 
-  btn.forEach(elem => {
-    elem.onclick = () => {
-      if (Number(elem.getAttribute('data-val'))) {
-        historyOperationElem.value += `${Number(elem.getAttribute('data-val'))}`;
-        console.log(Number(elem.getAttribute('data-val')))
-      } else {
-        historyOperationElem.value += `${elem.getAttribute('data-val')}`;
-        console.log(elem.getAttribute('data-val'))
-      }
-    }
-
-    btnResult.onclick = () => {
-      resultElem.value = historyOperationElem.value;
     }
   })
+
+  let lastSign = indexLastSignsArr[0];
+  indexLastSignsArr.forEach(elem => {
+    if (lastSign > elem) {
+      lastSign = elem;
+    }
+  })
+  const radicand = historyStr.substring(indexRoot + 1, lastSign)
+  // console.log('radicand', radicand)
+
+  return radicand
 }
+
+
+const arithmeticSign = ['+', '-', '*', '/', '.', '(', ')', '0', '√', '²'];
+const str = '3+5-√9+1*9'
+let indexLastSignsArr = [];
+
+arithmeticSign.forEach(sign => {
+  indexLastSignsArr.push(str.indexOf(sign));
+})
+
+let lastSign = indexLastSignsArr[0];
+indexLastSignsArr.forEach(elem => {
+  if (lastSign > elem) {
+    lastSign = elem;
+  }
+})
