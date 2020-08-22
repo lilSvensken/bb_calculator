@@ -1,12 +1,4 @@
-class Page {
-  operations = new Operations();
-
-  constructor() {
-
-  }
-}
-
-class Operations {
+class Calculator {
   btnsKeyboard;
   historyElem;
   btnResult;
@@ -14,7 +6,7 @@ class Operations {
   btnClear;
   toggleOnOff;
   includedCalc = false;
-  arithmeticSign = ['+', '-', '*', '/', '.', '(', ')', '0', '√', '²'];
+  arithmeticSign = ['+', '-', '*', '/', '.', '(', ')', '√', '²'];
   enterNumberKey = false;
   btnAddKeypad;
   additionalKeypadElem;
@@ -77,7 +69,7 @@ class Operations {
           break;
         default:
           if (this.includedCalc) {
-            if (Number(nameKey) || this.checkForArithmeticSign(nameKey)) {
+            if (Number(nameKey) || nameKey === '0' || this.checkForArithmeticSign(nameKey)) {
               this.showHistory(nameKey);
             }
           }
@@ -89,12 +81,9 @@ class Operations {
     if (this.enterNumberKey && this.checkForArithmeticSign(nameKey)) {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = false;
-    } else if (Number(nameKey) || nameKey === '(' || nameKey === '√') {
+    } else if (Number(nameKey) || nameKey === '0' || nameKey === '(' || nameKey === '√') {
       this.historyElem.innerHTML += nameKey;
       this.enterNumberKey = true;
-    }
-    if (!this.historyElem.innerHTML) {
-      this.enterNumberKey = false;
     }
   }
 
@@ -107,19 +96,17 @@ class Operations {
         let substr;
         if (arithmeticStr[i] === '√') {
           calculatedNum = this.getRadicand(arithmeticStr)
+          substr = arithmeticStr.substr(i, calculatedNum.length + 1);
           resultCalculatedNum = Math.sqrt(calculatedNum);
-          substr = arithmeticStr.substr(i, calculatedNum.length + 1)
         }
         if (arithmeticStr[i] === '²') {
-          calculatedNum = this.getSquareNum(arithmeticStr)
-          console.log(123)
+          calculatedNum = this.getSquareNum(arithmeticStr);
+          substr = arithmeticStr.substr(i - calculatedNum.length, calculatedNum.length + 1);
           resultCalculatedNum = Math.pow(calculatedNum, 2);
-          substr = arithmeticStr.substring(calculatedNum.length + 1, i + 1)
         }
         arithmeticStr = arithmeticStr.replace(substr, String(resultCalculatedNum))
       }
     }
-    console.log(arithmeticStr)
     this.resultElem.innerHTML = window.eval(arithmeticStr);
   }
 
@@ -202,9 +189,8 @@ class Operations {
 
     for (let i = 0; i < arithmeticStr.length; i++) {
       this.arithmeticSign.forEach(sign => {
-        if (arithmeticStr[i] === sign && i < indexSquareNum) {
+        if (arithmeticStr[i] === sign && i < indexSquareNum && arithmeticStr[i] !== '²') {
           indexPrevSignsArr.push(i)
-          console.log(111) // todo 6^2 проходит по несколько раз
         }
       })
     }
@@ -220,5 +206,5 @@ class Operations {
 }
 
 window.onload = () => {
-  new Page();
+  new Calculator();
 }
