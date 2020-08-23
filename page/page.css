@@ -1,7 +1,7 @@
 body * {
-    font-size: 32px;
     font-family: cursive;
     box-sizing: border-box;
+    font-size: 16px;
 }
 
 .content-wrapper {
@@ -11,16 +11,22 @@ body * {
 }
 
 .calculator-wrapper {
+    height: 624px;
+    display: flex;
     padding: 20px;
     background-color: #cafff8;
     border: 1px solid #828282;
     border-radius: 8px;
     box-shadow: 2px 2px 12px #acacac;
     position: relative;
-    width: 400px;
 }
 
-.counting-wrapper {
+.calc-panel-wrapper {
+    width: 330px;
+    margin-right: 16px;
+}
+
+.board-wrapper {
     background-color: #efefef;
     padding: 12px;
     border-radius: 6px;
@@ -28,29 +34,46 @@ body * {
     margin-bottom: 16px;
 }
 
-.value-wrapper {
+.board-wrapper.board-value-wrapper-history {
+    width: 230px;
+    height: 100%;
+    margin-bottom: 0;
+}
+
+.board-value-wrapper {
     background-color: #bbbbbb;
     border: 1px solid #666666;
     border-radius: 4px;
     padding: 4px 18px;
 }
 
-.value-wrapper.mod-active {
+.board-value-wrapper.board-value-wrapper-history {
+    height: 100%;
+    padding-right: 0;
+}
+
+.board-value-wrapper.mod-active {
     background-color: #ffffff;
 }
 
-.value {
+.board-value {
     flex: 1 1 100%;
     text-align: end;
-    font-size: 16px;
-    height: 34px;
+    height: 28px;
     width: 100%;
     word-break: break-all;
+    overflow: hidden;
 }
 
-.value.result {
+.board-value.result {
     font-size: 20px;
     font-weight: bold;
+}
+
+.board-value.history-operation {
+    height: 100%;
+    padding-right: 6px;
+    overflow: auto;
 }
 
 .keypad {
@@ -69,6 +92,7 @@ body * {
     border-radius: 4px;
     pointer-events: none;
     cursor: pointer;
+    font-size: 32px;
 }
 
 .btn.mod-active {
@@ -108,7 +132,6 @@ body * {
 }
 
 .calc-name {
-    font-size: 16px;
     font-family: monospace;
     left: 20px;
     position: absolute;
