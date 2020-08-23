@@ -1,6 +1,7 @@
 class Calculator {
+  valueWrapperElem;
   btnsKeyboard;
-  historyElem;
+  operatinStrElem;
   btnResult;
   resultElem;
   btnClear;
@@ -8,24 +9,18 @@ class Calculator {
   includedCalc = false;
   arithmeticSigns = ['+', '-', '*', '/', '.', '(', ')', '√', '²'];
 
-  // enterNumberKey = false;
   enterFirstKey = false;
   canEnterKey = false;
   lastKey;
 
-  btnAddKeypad;
-  additionalKeypadElem;
-  showAdditionalKeypad = false;
-
   constructor() {
+    this.valueWrapperElem = document.querySelector('#value-wrapper');
     this.btnsKeyboard = document.querySelectorAll('.btn');
-    this.historyElem = document.querySelector('#history-operation');
+    this.operatinStrElem = document.querySelector('#operating-str');
     this.btnResult = document.querySelector('#btn-result');
     this.resultElem = document.querySelector('#result');
     this.btnClear = document.querySelector('#clear');
     this.toggleOnOff = document.querySelector('#toggle-on-off');
-    this.btnAddKeypad = document.querySelector('#btn-add-keypad');
-    this.additionalKeypadElem = document.querySelector('#additional-keypad-wrapper');
 
     this.btnsKeyboard.forEach(elem => {
       elem.onclick = () => {
@@ -50,10 +45,6 @@ class Calculator {
       this.toggleCalc();
     }
 
-    this.btnAddKeypad.onclick = () => {
-      this.toggleAdditionalKeypad();
-    }
-
     window.onkeydown = (e) => {
       let nameKey = e.key
       switch (nameKey) {
@@ -74,7 +65,7 @@ class Calculator {
           break;
         default:
           if (this.includedCalc) {
-            if (Number(nameKey) || nameKey === '0' || this.checkForArithmeticSign(nameKey)) {
+            if (Number(nameKey) || nameKey === '0' || this.arithmeticSigns.some((sign) => nameKey === sign)) {
               this.showHistory(nameKey);
             }
           }
@@ -85,36 +76,39 @@ class Calculator {
   showHistory(nameKey) {
     if (this.enterFirstKey) {
       if ((Number(this.lastKey) || this.lastKey === '0') && nameKey !== '√' && nameKey !== '(') {
-        this.historyElem.innerHTML += nameKey;
+        this.operatinStrElem.innerHTML += nameKey;
         this.lastKey = nameKey;
       }
       this.arithmeticSigns.forEach(sign => {
         if (this.lastKey === sign && Number(nameKey) ||
           this.lastKey === sign && nameKey === '(' && this.lastKey !== '(' && this.lastKey !== '²' ||
-          this.lastKey === ')' && nameKey === sign && nameKey !== ')'){
-          this.historyElem.innerHTML += nameKey;
+          this.lastKey === ')' && nameKey === sign && nameKey !== ')' && nameKey !== '√'){
+          this.operatinStrElem.innerHTML += nameKey;
           this.lastKey = nameKey;
         }
       })
       if (this.lastKey === '(' && (Number(nameKey) || nameKey === '-' || nameKey === '√') ||
         this.lastKey === '-' && (Number(nameKey) || nameKey === '(' || nameKey === '√') ||
         this.lastKey === '²' && (Number(nameKey) || nameKey === '+' || nameKey === '-' || nameKey === '*' || nameKey === '/') ||
-        this.lastKey === ',' && Number(nameKey)) {
-        this.historyElem.innerHTML += nameKey;
+        this.lastKey === ',' && Number(nameKey) ||
+        this.lastKey === '+' && nameKey === '√' ||
+        this.lastKey === '-' && nameKey === '√' ||
+        this.lastKey === '*' && nameKey === '√' ||
+        this.lastKey === '/' && nameKey === '√') {
+        this.operatinStrElem.innerHTML += nameKey;
         this.lastKey = nameKey;
       }
     }
 
     if (!this.enterFirstKey && (Number(nameKey) || nameKey === '(' || nameKey === '-' || nameKey === '√')) {
-      console.log(this.lastKey, nameKey)
-      this.historyElem.innerHTML += nameKey;
+      this.operatinStrElem.innerHTML += nameKey;
       this.lastKey = nameKey;
       this.enterFirstKey = true;
     }
   }
 
   showResult() {
-    let arithmeticStr = this.historyElem.innerHTML;
+    let arithmeticStr = this.operatinStrElem.innerHTML;
     if (arithmeticStr) {
       for (let i = 0; i < arithmeticStr.length; i++) {
         let calculatedNum;
@@ -133,12 +127,13 @@ class Calculator {
         arithmeticStr = arithmeticStr.replace(substr, String(resultCalculatedNum))
       }
     }
+
     this.resultElem.innerHTML = window.eval(arithmeticStr);
   }
 
   clearLastSymbolHistory() {
-    let historyStr = this.historyElem.innerHTML;
-    this.historyElem.innerHTML = historyStr.substr(0, historyStr.length - 1);
+    let historyStr = this.operatinStrElem.innerHTML;
+    this.operatinStrElem.innerHTML = historyStr.substr(0, historyStr.length - 1);
     this.lastKey = historyStr.substr(historyStr.length - 1, 1);
     this.arithmeticSigns.forEach(sign => {
       if (this.lastKey === sign) {
@@ -151,50 +146,28 @@ class Calculator {
   }
 
   clearAllCalculations() {
-    this.historyElem.innerHTML = '';
-    this.resultElem.innerHTML = '0';
+    this.operatinStrElem.innerHTML = '';
+    this.resultElem.innerHTML = '';
     this.enterFirstKey = false;
   }
 
   toggleCalc() {
     if (this.includedCalc) {
       this.resultElem.innerHTML = '';
-      this.historyElem.innerHTML = '';
-      this.historyElem.classList.remove('mod-active');
-      this.resultElem.classList.remove('mod-active');
+      this.operatinStrElem.innerHTML = '';
+      this.valueWrapperElem.classList.remove('mod-active');
       this.btnsKeyboard.forEach(elem => {
         elem.classList.remove('mod-active');
       })
       this.includedCalc = false;
     } else {
-      this.resultElem.innerHTML = '0';
-      this.historyElem.classList.add('mod-active');
-      this.resultElem.classList.add('mod-active');
+      this.resultElem.innerHTML = '';
+      this.valueWrapperElem.classList.add('mod-active');
       this.btnsKeyboard.forEach(elem => {
         elem.classList.add('mod-active');
       })
       this.includedCalc = true;
     }
-  }
-
-  toggleAdditionalKeypad() {
-    if (this.showAdditionalKeypad) {
-      this.additionalKeypadElem.classList.remove('mod-show')
-      this.btnAddKeypad.innerText = '>';
-      this.showAdditionalKeypad = false;
-    } else {
-      this.additionalKeypadElem.classList.add('mod-show')
-      this.btnAddKeypad.innerText = '<';
-      this.showAdditionalKeypad = true;
-    }
-  }
-
-  checkForArithmeticSign(nameKey) {
-    let enterArithmeticSign = false;
-    if (this.arithmeticSigns.some((sign) => nameKey === sign)) {
-      enterArithmeticSign = true;
-    }
-    return enterArithmeticSign;
   }
 
   getRadicand(arithmeticStr) {
