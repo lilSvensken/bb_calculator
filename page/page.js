@@ -106,21 +106,20 @@ class Calculator {
     let arithmeticStr = this.operatingStrElem.innerHTML;
     if (arithmeticStr) {
       for (let i = 0; i < arithmeticStr.length; i++) {
-        let calculatedNum;
-        let resultCalculatedNum;
+        let extractedNum;
+        let resultSubstr;
         let substr;
         if (arithmeticStr[i] === '√') {
-          calculatedNum = this.getRadicand(arithmeticStr)
-          console.log(calculatedNum)
-          substr = arithmeticStr.substr(i, calculatedNum.length + 1);
-          resultCalculatedNum = Math.sqrt(calculatedNum);
+          extractedNum = this.getRadicand(arithmeticStr); // извлеченное чило (9)
+          substr = arithmeticStr.substr(i, extractedNum.length + 1); // субстрока (√9)
+          resultSubstr = Math.sqrt(extractedNum); // результат субстроки (3)
         }
         if (arithmeticStr[i] === '²') {
-          calculatedNum = this.getSquareNum(arithmeticStr);
-          substr = arithmeticStr.substr(i - calculatedNum.length, calculatedNum.length + 1);
-          resultCalculatedNum = Math.pow(calculatedNum, 2);
+          extractedNum = this.getSquareNum(arithmeticStr); // извлеченное чило (2)
+          substr = arithmeticStr.substr(i - extractedNum.length, extractedNum.length + 1); // субстрока (2²)
+          resultSubstr = Math.pow(extractedNum, 2); // результат субстроки (4)
         }
-        arithmeticStr = arithmeticStr.replace(substr, String(resultCalculatedNum))
+        arithmeticStr = arithmeticStr.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
       }
     }
 
@@ -180,19 +179,12 @@ class Calculator {
     for (let i = 0; i < arithmeticStr.length; i++) {
       this.arithmeticSigns.forEach(sign => {
         if (arithmeticStr[i] === sign && i > indexRoot) {
-          indexNextSignsArr.push(i)
+          indexNextSignsArr.push(i);
         }
       })
     }
 
-    let indexNextSign = indexNextSignsArr[0];
-    indexNextSignsArr.forEach(elem => {
-      if (indexNextSign > elem) {
-        indexNextSign = elem;
-      }
-    })
-
-    return arithmeticStr.substring(indexRoot + 1, indexNextSign)
+    return arithmeticStr.substring(indexRoot + 1, indexNextSignsArr[0]);
   }
 
   getSquareNum(arithmeticStr) {
@@ -206,14 +198,8 @@ class Calculator {
         }
       })
     }
-    let indexNextSign = indexPrevSignsArr[indexPrevSignsArr.length - 1];
-    indexPrevSignsArr.forEach(elem => {
-      if (indexNextSign < elem) {
-        indexNextSign = elem;
-      }
-    })
 
-    return arithmeticStr.substring(indexNextSign + 1, indexSquareNum)
+    return arithmeticStr.substring(indexPrevSignsArr[indexPrevSignsArr.length - 1] + 1, indexSquareNum)
   }
 }
 
