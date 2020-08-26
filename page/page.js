@@ -6,8 +6,8 @@ const arithmeticRunesMap = {
   dot: '.',
   open: '(',
   close: ')',
-  square: '√',
-  power: '²',
+  powerRoot: '√',
+  root: '²',
 }
 
 const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -152,22 +152,29 @@ class Calculator {
     this.currentString += nameKey;
   }
 
-  showOperatingStr() {
+  showOperatingStr(unmodifiedStr) {
+    if (unmodifiedStr) {
+      this.currentString = unmodifiedStr;
+    }
+
     this.operatingStrElem.innerHTML = this.currentString;
   }
 
   calculateResult() {
-    if (this.currentString.includes(arithmeticRunesMap.square)) {
-      this.currentString = this.getRadicand();
+    let unmodifiedStr = '';
+    if (this.currentString.includes(arithmeticRunesMap.powerRoot)) {
+      unmodifiedStr = this.currentString;
+      this.countPowerRoot();
     }
-    if (this.currentString.includes(arithmeticRunesMap.power)) {
-      this.currentString = this.getSquareNum();
+    if (this.currentString.includes(arithmeticRunesMap.root)) {
+      unmodifiedStr = this.currentString;
+      this.countRoot();
     }
     if (this.currentString) {
       try {
         this.currentResult = window.eval(this.currentString);
-        this.showResult();
-        this.showHistoryOperation();
+        this.showResult(unmodifiedStr);
+        this.showHistoryOperation(unmodifiedStr);
       } catch {
         // Ошибка
       }
@@ -177,12 +184,21 @@ class Calculator {
     }
   }
 
-  showResult() {
+  showResult(unmodifiedStr) {
+    if (unmodifiedStr) {
+      this.currentString = unmodifiedStr;
+      this.showOperatingStr(unmodifiedStr)
+    }
+
     this.resultElem.innerHTML = this.currentResult;
   }
 
-  showHistoryOperation() {
-    this.historyOperation.innerHTML += `${ this.currentString } = <br>${ this.currentResult }<br><br>`;
+  showHistoryOperation(unmodifiedStr) {
+    if (unmodifiedStr) {
+      this.historyOperation.innerHTML += `${ unmodifiedStr } = <br>${ this.currentResult }<br><br>`;
+    } else {
+      this.historyOperation.innerHTML += `${ this.currentString } = <br>${ this.currentResult }<br><br>`;
+    }
   }
 
   clearLastSymbol() {
@@ -231,39 +247,39 @@ class Calculator {
     }
   }
 
-  getRadicand() {
-    const indexRoot = this.currentString.indexOf(arithmeticRunesMap.square);
-    let indexNextSign = '';
+  countPowerRoot() {
+    const indexPowerRoot = this.currentString.indexOf(arithmeticRunesMap.powerRoot);
+    let indexNextSign;
 
     for (let i = 0; i < this.currentString.length; i++) {
       Object.keys(arithmeticRunesMap).forEach(key => {
-        if (!indexNextSign && this.currentString[i] === arithmeticRunesMap[key] && i > indexRoot) {
+        if (!indexNextSign && this.currentString[i] === arithmeticRunesMap[key] && i > indexPowerRoot) {
           indexNextSign = i;
         }
       })
     }
-    const extractedNum = window.eval(this.currentString.substring(indexRoot + 1, indexNextSign)); // извлеченное число (9)
-    const substr = this.currentString.substring(indexRoot, indexNextSign); // субстрока (√9);
+
+    const extractedNum = window.eval(this.currentString.substring(indexPowerRoot + 1, indexNextSign)); // извлеченное число (9)
+    const substr = this.currentString.substring(indexPowerRoot, indexNextSign); // субстрока (√9);
     const resultSubstr = Math.sqrt(extractedNum) // результат субстроки (3)
-    return this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
+    this.currentString = this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
   }
 
-  getSquareNum() {
-    const indexPower = this.currentString.indexOf(arithmeticRunesMap.power);
-    let indexPrevSign = '';
+  countRoot() {
+    const indexRoot = this.currentString.indexOf(arithmeticRunesMap.root);
+    let indexPrevSign;
 
     for (let i = 0; i < this.currentString.length; i++) {
       Object.keys(arithmeticRunesMap).forEach(key => {
-        if (this.currentString[i] === arithmeticRunesMap[key] && i < indexPower) {
+        if (this.currentString[i] === arithmeticRunesMap[key] && i < indexRoot) {
           indexPrevSign = i;
         }
       })
     }
-
-    const extractedNum = window.eval(this.currentString.substring(+indexPrevSign + 1, indexPower)); // извлеченное чило (2)
-    const substr = this.currentString.substring(+indexPrevSign + 1, indexPower + 1); // субстрока (2²)
+    const extractedNum = window.eval(this.currentString.substring(+indexPrevSign + 1, indexRoot)); // извлеченное чило (2)
+    const substr = this.currentString.substring(+indexPrevSign + 1, indexRoot + 1); // субстрока (2²)
     const resultSubstr = Math.pow(extractedNum, 2); // результат субстроки (4)
-    return this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
+    this.currentString = this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
   }
 }
 
