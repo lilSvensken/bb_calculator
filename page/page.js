@@ -1,4 +1,4 @@
-const arithmeticRunesMap = { // todo
+const arithmeticRunesMap = {
   plus: '+',
   minus: '-',
   factor: '*',
@@ -12,83 +12,26 @@ const arithmeticRunesMap = { // todo
 
 const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
-const rulesMap = {
-  ['+']: {
-    last: [...numbers, ')', '²'],
-    prev: []
-  },
-  ['-']: {
-    last: ['', ...numbers, ')', '²'],
-    prev: []
-  },
-  ['*']: {
-    last: [...numbers, ')', '²'],
-    prev: []
-  },
-  ['/']: {
-    last: [...numbers, ')', '²'],
-    prev: []
-  },
-  ['.']: {
-    last: [...numbers],
-    prev: []
-  },
-  ['(']: {
-    last: ['+', '-', '*', '/', '√'],
-    prev: []
-  },
-  [')']: {
-    last: [...numbers, '²'],
-    prev: ['(']
-  },
-  ['√']: {
-    last: ['+', '-', '*', '/', '('],
-    prev: []
-  },
-  ['²']: {
-    last: [...numbers],
-    prev: []
-  },
-  ['0']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['1']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['2']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['3']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['4']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['5']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['6']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['7']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['8']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
-  ['9']: {
-    last: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
-    prev: []
-  },
+const rulesKeysMap = {
+  ['+']: [...numbers, ')', '²'],
+  ['-']: ['', ...numbers, ')', '²'],
+  ['*']: [...numbers, ')', '²'],
+  ['/']: [...numbers, ')', '²'],
+  ['.']: [...numbers],
+  ['(']: ['', '+', '-', '*', '/', '√', '('],
+  [')']: [...numbers, '²', ')'],
+  ['√']: ['', '+', '-', '*', '/', '('],
+  ['²']: [...numbers, ')'],
+  ['0']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['1']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['2']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['3']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['4']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['5']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['6']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['7']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['8']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
+  ['9']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
 }
 
 class Calculator {
@@ -98,20 +41,10 @@ class Calculator {
   resultElem;
   historyOperation;
   enabledCalc = false;
-  arithmeticSigns = [ // todo удалить
-    arithmeticRunesMap.plus,
-    arithmeticRunesMap.minus,
-    arithmeticRunesMap.factor,
-    arithmeticRunesMap.delimiter,
-    arithmeticRunesMap.dot,
-    arithmeticRunesMap.open,
-    arithmeticRunesMap.close,
-    arithmeticRunesMap.square,
-    arithmeticRunesMap.power
-  ];
-  enterFirstKey = false;
-  lastNameKey = '';
   currentString = '';
+  currentResult = '';
+  countBracketNotClosed = 0;
+  dotNotSet = true;
 
   constructor() {
     this.boardValueElem = document.querySelectorAll('.board-value-wrapper');
@@ -125,7 +58,7 @@ class Calculator {
         const nameKey = elem.getAttribute('data-val');
         switch (nameKey) {
           case '=':
-            this.showResult();
+            this.calculateResult();
             break;
           case '(стереть)':
             this.clearLastSymbol();
@@ -141,139 +74,154 @@ class Calculator {
 
     window.onkeydown = (e) => {
       let nameKey = e.key
-      switch (nameKey) {
-        case '=':
-        case 'Enter':
-          this.showResult();
-          break;
-        case 'Backspace':
-          this.clearLastSymbol();
-          break;
-        case 'Delete':
-          if (this.enabledCalc) { // todo прибраться
+      if (this.enabledCalc) {
+        switch (nameKey) {
+          case '=':
+          case 'Enter':
+            this.calculateResult();
+            break;
+          case 'Backspace':
+            this.clearLastSymbol();
+            break;
+          case 'Delete':
             this.clearAllCalculations();
-          }
-          break;
-        case 'Escape':
-          this.toggleCalc();
-          break;
-
-        default:
-          if (this.enabledCalc) {
+            break;
+          case 'Escape':
+            this.toggleCalc();
+            break;
+          default:
             this.inputNewSymbol(nameKey);
-          }
+        }
+      } else if (nameKey === 'Escape') {
+        this.toggleCalc();
       }
     }
   }
 
   inputNewSymbol(nameKey) {
-    if (rulesMap[nameKey] && rulesMap[nameKey].last.includes(this.lastNameKey)) {
-
-      if (this.currentString && rulesMap[nameKey].prev.length) {
-        for (let i = this.currentString.length - 1; i >= 0; i--) {
-          if (rulesMap[nameKey].prev.includes(this.currentString[i])) {
-            this.addNewSymbol(nameKey);
-            this.showOperatingStr();
+    let isValid = false;
+    if (rulesKeysMap[nameKey] && rulesKeysMap[nameKey].includes(this.getLastSymbol())) {
+      switch (nameKey) {
+        case arithmeticRunesMap.open:
+          this.countBracketNotClosed++;
+          isValid = true;
+          break;
+        case arithmeticRunesMap.close:
+          if (this.countBracketNotClosed) {
+            this.countBracketNotClosed--;
+            isValid = true;
           }
-        }
-      } else {
+          break;
+        case arithmeticRunesMap.dot:
+          if (this.dotNotSet) {
+            this.dotNotSet = false;
+            isValid = true;
+          }
+          break;
+        case '0':
+          const correctZero = [
+            !this.getBeforeLastSymbol() && !this.getLastSymbol(),
+            this.getBeforeLastSymbol() === '0' && this.getLastSymbol() === '.',
+            +this.getLastSymbol(),
+            !!this.getBeforeLastSymbol() && this.getBeforeLastSymbol() !== '0' && this.getLastSymbol() === '0',
+            this.getBeforeLastSymbol() === '0' && this.getLastSymbol() === '0'
+          ]
+          if (correctZero.some(elem => elem)) {
+            isValid = true;
+          }
+          break;
+        default:
+          isValid = true;
+      }
+      if (isValid) {
         this.addNewSymbol(nameKey);
         this.showOperatingStr();
       }
     }
   }
 
+  getLastSymbol() {
+    return this.currentString.slice(-1);
+  }
+
+  getBeforeLastSymbol() {
+    return this.currentString.slice(-2, -1);
+  }
+
   addNewSymbol(nameKey) {
     this.currentString += nameKey;
-    this.lastNameKey = nameKey;
-    this.enterFirstKey = true;
   }
 
   showOperatingStr() {
     this.operatingStrElem.innerHTML = this.currentString;
+  }
 
-
-    // if (this.enterFirstKey) {
-    //
-    //   // todo проставить скобки
-    //   if ((Number(this.lastNameKey) || this.lastNameKey === '0') && nameKey !== '(' && nameKey !== ')' && nameKey !== '√' ||
-    //     this.lastNameKey === '(' && (Number(nameKey) || nameKey === '-' || nameKey === '√') ||
-    //     this.lastNameKey === '-' && (Number(nameKey) || nameKey === '(' || nameKey === '√') ||
-    //     this.lastNameKey === '²' && (Number(nameKey) || nameKey === '+' || nameKey === '-' || nameKey === '*' || nameKey === '/') ||
-    //     this.lastNameKey === ',' && Number(nameKey) ||
-    //     this.lastNameKey === '+' && nameKey === '√' ||
-    //     this.lastNameKey === '-' && nameKey === '√' ||
-    //     this.lastNameKey === '*' && nameKey === '√' ||
-    //     this.lastNameKey === '/' && nameKey === '√') {
-    //     this.operatingStrElem.innerHTML += nameKey;
-    //     this.lastNameKey = nameKey;
-    //   }
-    //   this.arithmeticSigns.forEach(sign => {
-    //     if (this.lastNameKey === sign && Number(nameKey) ||
-    //       this.lastNameKey === sign && nameKey === '(' && this.lastNameKey !== '(' && this.lastNameKey !== '²' ||
-    //       this.lastNameKey === ')' && nameKey === sign && nameKey !== ')' && nameKey !== '√') {
-    //       this.operatingStrElem.innerHTML += nameKey;
-    //       this.lastNameKey = nameKey;
-    //     }
-    //   })
-    // } else if (Number(nameKey) || nameKey === '(' || nameKey === '-' || nameKey === '√') {
-    //   this.operatingStrElem.innerHTML += nameKey;
-    //   this.lastNameKey = nameKey;
-    //   this.enterFirstKey = true;
-    // }
+  calculateResult() {
+    if (this.currentString.includes(arithmeticRunesMap.square)) {
+      this.currentString = this.getRadicand();
+    }
+    if (this.currentString.includes(arithmeticRunesMap.power)) {
+      this.currentString = this.getSquareNum();
+    }
+    if (this.currentString) {
+      try {
+        this.currentResult = window.eval(this.currentString);
+        this.showResult();
+        this.showHistoryOperation();
+      } catch {
+        // Ошибка
+      }
+    } else {
+      this.currentResult = '0';
+      this.showResult();
+    }
   }
 
   showResult() {
-    let arithmeticStr = this.operatingStrElem.innerHTML;
-
-    for (let i = 0; i < arithmeticStr.length; i++) {
-      if (arithmeticStr[i] === '√') {
-        arithmeticStr = this.getRadicand(arithmeticStr);
-      }
-      if (arithmeticStr[i] === '²') {
-        arithmeticStr = this.getSquareNum(arithmeticStr);
-      }
-    }
-
-    if (arithmeticStr) {
-      try {
-        this.resultElem.innerHTML = window.eval(arithmeticStr);
-        this.showHistoryOperation(this.operatingStrElem.innerHTML, this.resultElem.innerHTML);
-      } catch {
-        // при ошибке не считаем. catch - что бы js Не ругался
-      }
-    } else {
-      this.resultElem.innerHTML = '0';
-    }
+    this.resultElem.innerHTML = this.currentResult;
   }
 
-  showHistoryOperation(operatingStr, result) {
-    this.historyOperation.innerHTML += `${ operatingStr } = <br>${ result }<br><br>`;
+  showHistoryOperation() {
+    this.historyOperation.innerHTML += `${ this.currentString } = <br>${ this.currentResult }<br><br>`;
   }
 
   clearLastSymbol() {
+    switch (this.currentString.slice(-1)) {
+      case ')':
+        this.countBracketNotClosed++;
+        break;
+      case '(':
+        this.countBracketNotClosed--;
+        break;
+      case '.':
+        this.dotNotSet = true;
+    }
     this.currentString = this.currentString.slice(0, -1);
-    this.lastNameKey = this.currentString.slice(-1);
-    this.enterFirstKey = this.currentString.length === 1;
     this.showOperatingStr();
   }
 
   clearAllCalculations() {
+    if (this.currentString.includes('(') || this.currentString.includes(')')) {
+      this.countBracketNotClosed = 0;
+    }
+    if (this.currentString.includes('.')) {
+      this.dotNotSet = true;
+    }
+
     this.currentString = '';
-    this.lastNameKey = '';
-    this.enterFirstKey = false;
     this.showOperatingStr();
-    this.resultElem.innerHTML = '';
+    this.currentResult = '';
+    this.showResult()
   }
 
   toggleCalc() {
     if (this.enabledCalc) {
       this.currentString = '';
-      this.lastNameKey = '';
-      this.enabledCalc = false;
-      this.resultElem.innerHTML = '';
-      this.historyOperation.innerHTML = '';
       this.showOperatingStr();
+      this.currentResult = '';
+      this.showResult();
+      this.enabledCalc = false;
+      this.historyOperation.innerHTML = '';
       this.boardValueElem.forEach(elem => elem.classList.remove('mod-active'));
       this.btnsKeyboard.forEach(elem => elem.classList.remove('mod-active'));
     } else {
@@ -283,72 +231,39 @@ class Calculator {
     }
   }
 
-  getRadicand(arithmeticStr) {
-    let indexNextSignsArr = [];
-    let openingBracketArr = [];
-    let closingBracketArr = [];
-    let extractedNum;
-    let substr;
+  getRadicand() {
+    const indexRoot = this.currentString.indexOf(arithmeticRunesMap.square);
+    let indexNextSign = '';
 
-    const indexRoot = arithmeticStr.indexOf('√');
-
-    for (let i = 0; i < arithmeticStr.length; i++) {
-      if (arithmeticStr[i] === '(' && i > indexRoot) {
-        openingBracketArr.push(i);
-      }
-      if (arithmeticStr[i] === ')' && i > indexRoot) {
-        closingBracketArr.push(i);
-      }
-      this.arithmeticSigns.forEach(sign => {
-        if (arithmeticStr[i] === sign && i > indexRoot && arithmeticStr[i] !== '(' && arithmeticStr[i] !== ')') {
-          indexNextSignsArr.push(i);
+    for (let i = 0; i < this.currentString.length; i++) {
+      Object.keys(arithmeticRunesMap).forEach(key => {
+        if (!indexNextSign && this.currentString[i] === arithmeticRunesMap[key] && i > indexRoot) {
+          indexNextSign = i;
         }
       })
     }
-
-    if (openingBracketArr.length) {
-      extractedNum = eval(arithmeticStr.substring(openingBracketArr[0] + 1, closingBracketArr[0])); // извлеченное число (9)
-      substr = arithmeticStr.substring(indexRoot, closingBracketArr[0] + 1); // субстрока (√(7+2));
-    } else {
-      extractedNum = arithmeticStr.substring(indexRoot + 1, indexNextSignsArr[0]); // извлеченное число (9)
-      substr = arithmeticStr.substr(indexRoot, extractedNum.length + 1); // субстрока (√9);
-    }
+    const extractedNum = window.eval(this.currentString.substring(indexRoot + 1, indexNextSign)); // извлеченное число (9)
+    const substr = this.currentString.substring(indexRoot, indexNextSign); // субстрока (√9);
     const resultSubstr = Math.sqrt(extractedNum) // результат субстроки (3)
-    return arithmeticStr.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
+    return this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
   }
 
-  getSquareNum(arithmeticStr) {
-    const indexSquareNum = arithmeticStr.indexOf('²');
-    let indexPrevSignsArr = [];
-    let openingBracketArr = [];
-    let closingBracketArr = [];
-    let extractedNum;
-    let substr;
+  getSquareNum() {
+    const indexPower = this.currentString.indexOf(arithmeticRunesMap.power);
+    let indexPrevSign = '';
 
-    for (let i = 0; i < arithmeticStr.length; i++) {
-      if (arithmeticStr[i] === '(' && i < indexSquareNum) {
-        openingBracketArr.push(i);
-      }
-      if (arithmeticStr[i] === ')' && i < indexSquareNum) {
-        closingBracketArr.push(i);
-      }
-      this.arithmeticSigns.forEach(sign => {
-        if (arithmeticStr[i] === sign && i < indexSquareNum && arithmeticStr[i] !== '²' && arithmeticStr[i] !== '(' && arithmeticStr[i] !== ')') {
-          indexPrevSignsArr.push(i)
+    for (let i = 0; i < this.currentString.length; i++) {
+      Object.keys(arithmeticRunesMap).forEach(key => {
+        if (this.currentString[i] === arithmeticRunesMap[key] && i < indexPower) {
+          indexPrevSign = i;
         }
       })
     }
 
-    if (openingBracketArr.length) {
-      extractedNum = eval(arithmeticStr.substring(openingBracketArr[0] + 1, closingBracketArr[0])); // извлеченное чило (2)
-      substr = arithmeticStr.substring(openingBracketArr[0], indexSquareNum + 1); // субстрока (1+1)²
-    } else {
-      extractedNum = arithmeticStr.substring(indexPrevSignsArr[indexPrevSignsArr.length - 1] + 1, indexSquareNum) // извлеченное чило (2)
-      substr = arithmeticStr.substr(indexSquareNum - extractedNum.length, extractedNum.length + 1); // субстрока (2²)
-    }
-
+    const extractedNum = window.eval(this.currentString.substring(+indexPrevSign + 1, indexPower)); // извлеченное чило (2)
+    const substr = this.currentString.substring(+indexPrevSign + 1, indexPower + 1); // субстрока (2²)
     const resultSubstr = Math.pow(extractedNum, 2); // результат субстроки (4)
-    return arithmeticStr.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
+    return this.currentString.replace(substr, String(resultSubstr)) // заменяем "субстроку" на "результат субстроки"
   }
 }
 
