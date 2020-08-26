@@ -35,23 +35,20 @@ const rulesKeysMap = {
 }
 
 class Calculator {
-  boardValueElem;
   btnsKeyboard;
-  operatingStrElem;
-  resultElem;
-  historyOperation;
+  boardElems;
   enabledCalc = false;
-  currentString = '';
-  currentResult = '';
   countBracketNotClosed = 0;
   dotNotSet = true;
+  currentString = '';
+  currentResult = '';
+
+  boardValue = new BoardValue();
+  boardHistory = new BoardHistory();
 
   constructor() {
-    this.boardValueElem = document.querySelectorAll('.board-value-wrapper');
     this.btnsKeyboard = document.querySelectorAll('.btn');
-    this.operatingStrElem = document.querySelector('#operating-str');
-    this.resultElem = document.querySelector('#result');
-    this.historyOperation = document.querySelector('#history-operation');
+    this.boardElems = document.querySelectorAll('.board');
 
     this.btnsKeyboard.forEach(elem => {
       elem.onclick = () => {
@@ -135,7 +132,7 @@ class Calculator {
       }
       if (isValid) {
         this.addNewSymbol(nameKey);
-        this.showOperatingStr();
+        this.boardValue.showOperatingStr(this.currentString);
       }
     }
   }
@@ -152,14 +149,6 @@ class Calculator {
     this.currentString += nameKey;
   }
 
-  showOperatingStr(unmodifiedStr) {
-    if (unmodifiedStr) {
-      this.currentString = unmodifiedStr;
-    }
-
-    this.operatingStrElem.innerHTML = this.currentString;
-  }
-
   calculateResult() {
     let unmodifiedStr = '';
     if (this.currentString.includes(arithmeticRunesMap.powerRoot)) {
@@ -173,31 +162,18 @@ class Calculator {
     if (this.currentString) {
       try {
         this.currentResult = window.eval(this.currentString);
-        this.showResult(unmodifiedStr);
-        this.showHistoryOperation(unmodifiedStr);
+        this.boardValue.showResult(this.currentResult);
+        if (unmodifiedStr) {
+          this.boardHistory.showHistoryOperation(unmodifiedStr, this.currentResult)
+        } else {
+          this.boardHistory.showHistoryOperation(this.currentString, this.currentResult)
+        }
       } catch {
         // Ошибка
       }
     } else {
       this.currentResult = '0';
-      this.showResult();
-    }
-  }
-
-  showResult(unmodifiedStr) {
-    if (unmodifiedStr) {
-      this.currentString = unmodifiedStr;
-      this.showOperatingStr(unmodifiedStr)
-    }
-
-    this.resultElem.innerHTML = this.currentResult;
-  }
-
-  showHistoryOperation(unmodifiedStr) {
-    if (unmodifiedStr) {
-      this.historyOperation.innerHTML += `${ unmodifiedStr } = <br>${ this.currentResult }<br><br>`;
-    } else {
-      this.historyOperation.innerHTML += `${ this.currentString } = <br>${ this.currentResult }<br><br>`;
+      this.boardValue.showResult(this.currentResult);
     }
   }
 
@@ -213,7 +189,7 @@ class Calculator {
         this.dotNotSet = true;
     }
     this.currentString = this.currentString.slice(0, -1);
-    this.showOperatingStr();
+    this.boardValue.showOperatingStr(this.currentString);
   }
 
   clearAllCalculations() {
@@ -224,25 +200,22 @@ class Calculator {
       this.dotNotSet = true;
     }
 
-    this.currentString = '';
-    this.showOperatingStr();
-    this.currentResult = '';
-    this.showResult()
+    this.boardValue.showOperatingStr('');
+    this.boardValue.showResult('')
   }
 
   toggleCalc() {
     if (this.enabledCalc) {
-      this.currentString = '';
-      this.showOperatingStr();
+      this.currentString = ''
+      this.boardValue.showOperatingStr(this.currentString);
       this.currentResult = '';
-      this.showResult();
+      this.boardValue.showResult(this.currentResult);
+      this.boardHistory.showHistoryOperation(this.currentString, this.currentResult);      this.btnsKeyboard.forEach(elem => elem.classList.remove('mod-active'));
+      this.boardElems.forEach(elem => elem.classList.remove('mod-active'))
       this.enabledCalc = false;
-      this.historyOperation.innerHTML = '';
-      this.boardValueElem.forEach(elem => elem.classList.remove('mod-active'));
-      this.btnsKeyboard.forEach(elem => elem.classList.remove('mod-active'));
     } else {
-      this.boardValueElem.forEach(elem => elem.classList.add('mod-active'));
       this.btnsKeyboard.forEach(elem => elem.classList.add('mod-active'));
+      this.boardElems.forEach(elem => elem.classList.add('mod-active'))
       this.enabledCalc = true;
     }
   }

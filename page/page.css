@@ -34,25 +34,25 @@ body * {
     margin-bottom: 16px;
 }
 
-.board-wrapper.board-value-wrapper-history {
+.board-wrapper.board-wrapper-history {
     width: 230px;
     height: 100%;
     margin-bottom: 0;
 }
 
-.board-value-wrapper {
+.board {
     background-color: #bbbbbb;
     border: 1px solid #666666;
     border-radius: 4px;
     padding: 4px 18px;
 }
 
-.board-value-wrapper.board-value-wrapper-history {
+.board.board-history {
     height: 100%;
     padding-right: 0;
 }
 
-.board-value-wrapper.mod-active {
+.board.mod-active {
     background-color: #ffffff;
 }
 

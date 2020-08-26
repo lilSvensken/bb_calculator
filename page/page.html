@@ -5,6 +5,8 @@
   <title>Lizocalc-2020-dk</title>
   <link rel="stylesheet" type="text/css" href="page.css">
   <script type="text/javascript" src="page.js"></script>
+  <script type="text/javascript" src="boardValue.component.js"></script>
+  <script type="text/javascript" src="boardHistory.component.js"></script>
 </head>
 <body>
 
@@ -12,7 +14,7 @@
   <div class="calculator-wrapper">
     <div class="calc-panel-wrapper">
       <div class="board-wrapper">
-        <div class="board-value-wrapper">
+        <div class="board">
           <div class="board-value operating-str" id="operating-str"></div>
           <div class="board-value result" id="result"></div>
         </div>
@@ -49,8 +51,8 @@
     </div>
 
     <div class="history-panel-wrapper">
-      <div class="board-wrapper board-value-wrapper-history">
-        <div class="board-value-wrapper board-value-wrapper-history">
+      <div class="board-wrapper board-wrapper-history">
+        <div class="board board-history">
           <div class="board-value history-operation" id="history-operation"></div>
         </div>
       </div>
