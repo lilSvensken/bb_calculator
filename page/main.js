@@ -34,7 +34,7 @@ const rulesKeysMap = {
   ['9']: ['', ...numbers, '+', '-', '*', '/', '.', '(', '√'],
 }
 
-class Calculator {
+class Main {
   btnsKeyboard;
   boardElems;
   enabledCalc = false;
@@ -81,7 +81,7 @@ class Calculator {
             this.clearLastSymbol();
             break;
           case 'Delete':
-            this.clearAllCalculations();
+            this.resetCalculations();
             break;
           case 'Escape':
             this.toggleCalc();
@@ -122,8 +122,8 @@ class Calculator {
             +this.getLastSymbol(),
             !!this.getBeforeLastSymbol() && this.getBeforeLastSymbol() !== '0' && this.getLastSymbol() === '0',
             this.getBeforeLastSymbol() === '0' && this.getLastSymbol() === '0'
-          ]
-          if (correctZero.some(elem => elem)) {
+          ];
+          if (correctZero.some(rule => rule)) {
             isValid = true;
           }
           break;
@@ -168,6 +168,8 @@ class Calculator {
         } else {
           this.boardHistory.showHistoryOperation(this.currentString, this.currentResult)
         }
+        this.currentString = '';
+        this.boardValue.showOperatingStr(this.currentString)
       } catch {
         // Ошибка
       }
@@ -178,7 +180,7 @@ class Calculator {
   }
 
   clearLastSymbol() {
-    switch (this.currentString.slice(-1)) {
+    switch (this.getLastSymbol()) {
       case ')':
         this.countBracketNotClosed++;
         break;
@@ -192,25 +194,19 @@ class Calculator {
     this.boardValue.showOperatingStr(this.currentString);
   }
 
-  clearAllCalculations() {
-    if (this.currentString.includes('(') || this.currentString.includes(')')) {
-      this.countBracketNotClosed = 0;
-    }
-    if (this.currentString.includes('.')) {
-      this.dotNotSet = true;
-    }
-
-    this.boardValue.showOperatingStr('');
-    this.boardValue.showResult('')
+  resetCalculations() {
+    this.countBracketNotClosed = 0;
+    this.dotNotSet = true;
+    this.currentString = '';
+    this.currentResult = '';
+    this.boardValue.clearBordValue();
   }
 
   toggleCalc() {
     if (this.enabledCalc) {
-      this.currentString = ''
-      this.boardValue.showOperatingStr(this.currentString);
-      this.currentResult = '';
-      this.boardValue.showResult(this.currentResult);
-      this.boardHistory.showHistoryOperation(this.currentString, this.currentResult);      this.btnsKeyboard.forEach(elem => elem.classList.remove('mod-active'));
+      this.resetCalculations()
+      this.boardHistory.clearShowHistory();
+      this.btnsKeyboard.forEach(elem => elem.classList.remove('mod-active'));
       this.boardElems.forEach(elem => elem.classList.remove('mod-active'))
       this.enabledCalc = false;
     } else {
@@ -257,5 +253,5 @@ class Calculator {
 }
 
 window.onload = () => {
-  new Calculator();
+  new Main();
 }

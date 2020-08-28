@@ -14,4 +14,9 @@ class BoardValue {
   showResult(currentResult) {
     this.resultElem.innerHTML = currentResult;
   }
+
+  clearBordValue() {
+    this.operatingStrElem.innerHTML = '';
+    this.resultElem.innerHTML = '';
+  }
 }
